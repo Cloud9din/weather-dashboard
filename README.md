@@ -393,15 +393,6 @@ Possible future improvements include:
 - Additional weather animations
 - Dark/light mode control
 
----
-
-## 👨‍💻 Developer
-
-**Abu Lashkor**
-
-GitHub: [Cloud9din](https://github.com/Cloud9din)
-
-Built as part of my web development portfolio using **HTML, CSS and JavaScript**.
 
 ---
 
@@ -423,6 +414,16 @@ Built as part of my web development portfolio using **HTML, CSS and JavaScript**
 - Responsive design ✅
 - GitHub Pages deployment ✅
 
+
 ---
+
+## 👨‍💻 Developer
+
+**Abu Lashkor**
+
+GitHub: [Cloud9din](https://github.com/Cloud9din)
+
+Built as part of my web development portfolio using **HTML, CSS and JavaScript**.
+
 
 ⭐ If you find this project useful, feel free to explore the code and repository.
