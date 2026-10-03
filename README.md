@@ -355,15 +355,11 @@ Project screenshots will be added here.
 
 ### Weather Dashboard
 
-```text
-Screenshot coming soon
-```
+weather-dashboard.png
 
 ### Mobile View
 
-```text
-Screenshot coming soon
-```
+weather-dashboard-mobile.png
 
 ---
 
