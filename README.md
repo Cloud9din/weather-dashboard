@@ -12,6 +12,16 @@ SkyCast allows users to search for cities around the world, view current weather
 
 ---
 
+## 📸 Screenshots
+
+### Weather Dashboard
+
+![SkyCast Weather Dashboard](weather-dashboard.png)
+
+### Mobile View
+
+![SkyCast Mobile Weather Dashboard](weather-dashboard-mobile.png)
+
 ## ✨ Features
 
 ### 🔍 City Search
@@ -346,20 +356,6 @@ The application can be tested by:
 9. Testing the current-location feature
 10. Searching for an invalid location
 11. Testing desktop and mobile layouts
-
----
-
-## 📸 Screenshots
-
-Project screenshots will be added here.
-
-### Weather Dashboard
-
-weather-dashboard.png
-
-### Mobile View
-
-weather-dashboard-mobile.png
 
 ---
 
