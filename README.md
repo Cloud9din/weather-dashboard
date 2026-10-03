@@ -1,4 +1,4 @@
-# ☁️ SkyCast — Weather Dashboard
+# ☁️ SkyCast - Weather Dashboard
 
 A modern, responsive and interactive weather dashboard built with **HTML, CSS and JavaScript** using live weather data from the **Open-Meteo API**.
 
