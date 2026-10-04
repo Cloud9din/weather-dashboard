@@ -1,84 +1,227 @@
-// =====================================================
+// =============================================
 // SKYCAST WEATHER DASHBOARD
-// Live weather data powered by Open-Meteo
-// =====================================================
+// =============================================
 
-const searchForm = document.getElementById("weather-search-form");
-const searchInput = document.getElementById("city-search");
-const suggestionsBox = document.getElementById("search-suggestions");
-const statusBox = document.getElementById("weather-status");
+const searchForm =
+  document.getElementById(
+    "weather-search-form"
+  );
 
-const locationButton = document.getElementById("current-location-button");
-const unitButton = document.getElementById("unit-toggle");
-const favouriteButton = document.getElementById("favourite-button");
+const searchInput =
+  document.getElementById(
+    "city-search"
+  );
 
-const locationName = document.getElementById("location-name");
-const currentDate = document.getElementById("current-date");
+const suggestionsBox =
+  document.getElementById(
+    "search-suggestions"
+  );
 
-const weatherIcon = document.getElementById("weather-icon");
-const currentTemperature = document.getElementById("current-temperature");
-const temperatureUnit = document.getElementById("temperature-unit");
+const statusBox =
+  document.getElementById(
+    "weather-status"
+  );
 
-const weatherDescription = document.getElementById("weather-description");
-const feelsLike = document.getElementById("feels-like");
-const feelsLikeUnit = document.getElementById("feels-like-unit");
+const locationButton =
+  document.getElementById(
+    "current-location-button"
+  );
 
-const todayHigh = document.getElementById("today-high");
-const todayLow = document.getElementById("today-low");
+const refreshButton =
+  document.getElementById(
+    "refresh-button"
+  );
 
-const humidity = document.getElementById("humidity");
-const windSpeed = document.getElementById("wind-speed");
-const visibility = document.getElementById("visibility");
-const precipitation = document.getElementById("precipitation");
+const unitButton =
+  document.getElementById(
+    "unit-toggle"
+  );
 
-const sunrise = document.getElementById("sunrise");
-const sunset = document.getElementById("sunset");
+const favouriteButton =
+  document.getElementById(
+    "favourite-button"
+  );
 
-const forecastGrid = document.getElementById("forecast-grid");
-const savedLocations = document.getElementById("saved-locations");
-const emptyFavourites = document.getElementById("empty-favourites");
+const locationName =
+  document.getElementById(
+    "location-name"
+  );
 
-const STORAGE_KEY = "skycastFavourites";
-const LAST_LOCATION_KEY = "skycastLastLocation";
+const currentDate =
+  document.getElementById(
+    "current-date"
+  );
+
+const localTime =
+  document.getElementById(
+    "local-time"
+  );
+
+const weatherIcon =
+  document.getElementById(
+    "weather-icon"
+  );
+
+const currentTemperature =
+  document.getElementById(
+    "current-temperature"
+  );
+
+const temperatureUnit =
+  document.getElementById(
+    "temperature-unit"
+  );
+
+const weatherDescription =
+  document.getElementById(
+    "weather-description"
+  );
+
+const feelsLike =
+  document.getElementById(
+    "feels-like"
+  );
+
+const feelsLikeUnit =
+  document.getElementById(
+    "feels-like-unit"
+  );
+
+const todayHigh =
+  document.getElementById(
+    "today-high"
+  );
+
+const todayLow =
+  document.getElementById(
+    "today-low"
+  );
+
+const humidity =
+  document.getElementById(
+    "humidity"
+  );
+
+const windSpeed =
+  document.getElementById(
+    "wind-speed"
+  );
+
+const visibility =
+  document.getElementById(
+    "visibility"
+  );
+
+const precipitation =
+  document.getElementById(
+    "precipitation"
+  );
+
+const sunrise =
+  document.getElementById(
+    "sunrise"
+  );
+
+const sunset =
+  document.getElementById(
+    "sunset"
+  );
+
+const forecastGrid =
+  document.getElementById(
+    "forecast-grid"
+  );
+
+const savedLocations =
+  document.getElementById(
+    "saved-locations"
+  );
+
+const weatherCard =
+  document.getElementById(
+    "current-weather-card"
+  );
+
+
+const FAVOURITES_KEY =
+  "skycastFavourites";
+
+const LAST_LOCATION_KEY =
+  "skycastLastLocation";
+
+const UNIT_KEY =
+  "skycastUnit";
+
 
 let currentLocation = null;
+
 let currentWeatherData = null;
-let temperatureMode = "C";
+
+let temperatureMode =
+  localStorage.getItem(
+    UNIT_KEY
+  ) || "C";
 
 let searchTimer;
 
 
-// =====================================================
+// =============================================
 // DEFAULT LOCATION
-// =====================================================
+// =============================================
 
 const defaultLocation = {
-  name: "Exeter",
-  country: "United Kingdom",
-  latitude: 50.7184,
-  longitude: -3.5339
+
+  name:
+    "Exeter",
+
+  country:
+    "United Kingdom",
+
+  admin1:
+    "England",
+
+  latitude:
+    50.7184,
+
+  longitude:
+    -3.5339
+
 };
 
 
-// =====================================================
+// =============================================
 // TEMPERATURE
-// =====================================================
+// =============================================
 
-function convertTemperature(value) {
+function convertTemperature(
+  temperature
+) {
 
-  if (value === null || value === undefined) {
+  if (
+    temperature === null ||
+    temperature === undefined
+  ) {
+
     return "--";
+
   }
 
-  if (temperatureMode === "F") {
+
+  if (
+    temperatureMode === "F"
+  ) {
 
     return Math.round(
-      (value * 9) / 5 + 32
+      temperature * 9 / 5 + 32
     );
 
   }
 
-  return Math.round(value);
+
+  return Math.round(
+    temperature
+  );
+
 }
 
 
@@ -87,31 +230,42 @@ function getTemperatureUnit() {
   return temperatureMode === "C"
     ? "°C"
     : "°F";
+
 }
 
 
-// =====================================================
-// WEATHER CODE INFORMATION
-// =====================================================
+// =============================================
+// WEATHER CODE
+// =============================================
 
-function getWeatherInfo(code, isDay = 1) {
+function getWeatherInfo(
+  code,
+  isDay = 1
+) {
 
-  const day = Number(isDay) === 1;
+  const day =
+    Number(isDay) === 1;
+
 
   if (code === 0) {
 
     return {
-      description: day
-        ? "Clear sky"
-        : "Clear night",
 
-      icon: day
-        ? "☀️"
-        : "🌙",
+      description:
+        day
+          ? "Clear sky"
+          : "Clear night",
 
-      theme: day
-        ? "weather-clear"
-        : "weather-night"
+      icon:
+        day
+          ? "☀️"
+          : "🌙",
+
+      theme:
+        day
+          ? "weather-clear"
+          : "weather-night"
+
     };
 
   }
@@ -120,11 +274,20 @@ function getWeatherInfo(code, isDay = 1) {
   if (code === 1) {
 
     return {
-      description: "Mainly clear",
-      icon: day ? "🌤️" : "🌙",
-      theme: day
-        ? "weather-clear"
-        : "weather-night"
+
+      description:
+        "Mainly clear",
+
+      icon:
+        day
+          ? "🌤️"
+          : "🌙",
+
+      theme:
+        day
+          ? "weather-clear"
+          : "weather-night"
+
     };
 
   }
@@ -133,9 +296,16 @@ function getWeatherInfo(code, isDay = 1) {
   if (code === 2) {
 
     return {
-      description: "Partly cloudy",
-      icon: "⛅",
-      theme: "weather-cloudy"
+
+      description:
+        "Partly cloudy",
+
+      icon:
+        "⛅",
+
+      theme:
+        "weather-cloudy"
+
     };
 
   }
@@ -144,349 +314,459 @@ function getWeatherInfo(code, isDay = 1) {
   if (code === 3) {
 
     return {
-      description: "Overcast",
-      icon: "☁️",
-      theme: "weather-cloudy"
+
+      description:
+        "Overcast",
+
+      icon:
+        "☁️",
+
+      theme:
+        "weather-cloudy"
+
     };
 
   }
 
 
-  if ([45, 48].includes(code)) {
+  if (
+    [45, 48].includes(code)
+  ) {
 
     return {
-      description: "Foggy",
-      icon: "🌫️",
-      theme: "weather-cloudy"
+
+      description:
+        "Foggy",
+
+      icon:
+        "🌫️",
+
+      theme:
+        "weather-cloudy"
+
     };
 
   }
 
 
-  if ([51, 53, 55].includes(code)) {
+  if (
+    [
+      51,
+      53,
+      55,
+      56,
+      57
+    ].includes(code)
+  ) {
 
     return {
-      description: "Drizzle",
-      icon: "🌦️",
-      theme: "weather-rain"
+
+      description:
+        "Drizzle",
+
+      icon:
+        "🌦️",
+
+      theme:
+        "weather-rain"
+
     };
 
   }
 
 
-  if ([56, 57].includes(code)) {
+  if (
+    [
+      61,
+      63,
+      65,
+      66,
+      67
+    ].includes(code)
+  ) {
 
     return {
-      description: "Freezing drizzle",
-      icon: "🌧️",
-      theme: "weather-rain"
+
+      description:
+        "Rain",
+
+      icon:
+        "🌧️",
+
+      theme:
+        "weather-rain"
+
     };
 
   }
 
 
-  if ([61, 63, 65].includes(code)) {
+  if (
+    [
+      71,
+      73,
+      75,
+      77
+    ].includes(code)
+  ) {
 
     return {
-      description: "Rain",
-      icon: "🌧️",
-      theme: "weather-rain"
+
+      description:
+        "Snow",
+
+      icon:
+        "❄️",
+
+      theme:
+        "weather-snow"
+
     };
 
   }
 
 
-  if ([66, 67].includes(code)) {
+  if (
+    [
+      80,
+      81,
+      82
+    ].includes(code)
+  ) {
 
     return {
-      description: "Freezing rain",
-      icon: "🌧️",
-      theme: "weather-rain"
+
+      description:
+        "Rain showers",
+
+      icon:
+        "🌦️",
+
+      theme:
+        "weather-rain"
+
     };
 
   }
 
 
-  if ([71, 73, 75, 77].includes(code)) {
+  if (
+    [
+      85,
+      86
+    ].includes(code)
+  ) {
 
     return {
-      description: "Snow",
-      icon: "❄️",
-      theme: "weather-snow"
+
+      description:
+        "Snow showers",
+
+      icon:
+        "🌨️",
+
+      theme:
+        "weather-snow"
+
     };
 
   }
 
 
-  if ([80, 81, 82].includes(code)) {
+  if (
+    [
+      95,
+      96,
+      99
+    ].includes(code)
+  ) {
 
     return {
-      description: "Rain showers",
-      icon: "🌦️",
-      theme: "weather-rain"
-    };
 
-  }
+      description:
+        "Thunderstorm",
 
+      icon:
+        "⛈️",
 
-  if ([85, 86].includes(code)) {
+      theme:
+        "weather-rain"
 
-    return {
-      description: "Snow showers",
-      icon: "🌨️",
-      theme: "weather-snow"
-    };
-
-  }
-
-
-  if ([95, 96, 99].includes(code)) {
-
-    return {
-      description: "Thunderstorm",
-      icon: "⛈️",
-      theme: "weather-rain"
     };
 
   }
 
 
   return {
-    description: "Weather unavailable",
-    icon: "🌤️",
-    theme: "weather-cloudy"
+
+    description:
+      "Weather unavailable",
+
+    icon:
+      "🌤️",
+
+    theme:
+      "weather-cloudy"
+
   };
+
 }
 
 
-// =====================================================
-// STATUS MESSAGE
-// =====================================================
+// =============================================
+// STATUS
+// =============================================
 
-function showStatus(message, type = "loading") {
+function showStatus(
+  message,
+  type = "loading"
+) {
 
-  statusBox.textContent = message;
+  statusBox.textContent =
+    message;
 
   statusBox.className =
     `weather-status show ${type}`;
+
 }
 
 
 function hideStatus() {
 
-  statusBox.textContent = "";
+  statusBox.textContent =
+    "";
 
   statusBox.className =
     "weather-status";
+
 }
 
 
-// =====================================================
-// DATE FORMATTING
-// =====================================================
+// =============================================
+// DATE
+// =============================================
 
-function formatDate(dateString, options = {}) {
+function formatDate(
+  dateString
+) {
 
-  if (!dateString) {
-    return "";
-  }
+  const parts =
+    dateString
+      .split("-")
+      .map(Number);
 
-  const [year, month, day] =
-    dateString.split("-").map(Number);
 
-  const date = new Date(
-    Date.UTC(
-      year,
-      month - 1,
-      day
-    )
-  );
+  const date =
+    new Date(
+      Date.UTC(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+      )
+    );
+
 
   return new Intl.DateTimeFormat(
     "en-GB",
     {
-      weekday: "long",
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      timeZone: "UTC",
-      ...options
+      weekday:
+        "long",
+
+      day:
+        "numeric",
+
+      month:
+        "long",
+
+      year:
+        "numeric",
+
+      timeZone:
+        "UTC"
     }
   ).format(date);
+
 }
 
 
-function formatForecastDay(dateString, index) {
+function formatForecastDay(
+  dateString,
+  index
+) {
 
   if (index === 0) {
     return "Today";
   }
 
+
   if (index === 1) {
     return "Tomorrow";
   }
 
-  const [year, month, day] =
-    dateString.split("-").map(Number);
 
-  const date = new Date(
-    Date.UTC(
-      year,
-      month - 1,
-      day
-    )
-  );
+  const parts =
+    dateString
+      .split("-")
+      .map(Number);
+
+
+  const date =
+    new Date(
+      Date.UTC(
+        parts[0],
+        parts[1] - 1,
+        parts[2]
+      )
+    );
+
 
   return new Intl.DateTimeFormat(
     "en-GB",
     {
-      weekday: "short",
-      timeZone: "UTC"
+      weekday:
+        "short",
+
+      timeZone:
+        "UTC"
     }
   ).format(date);
+
 }
 
 
-function formatTime(timeString) {
+function getTimeFromISO(
+  value
+) {
 
-  if (!timeString) {
+  if (!value) {
     return "--:--";
   }
 
-  const time =
-    timeString.includes("T")
-      ? timeString.split("T")[1]
-      : timeString;
 
-  const [hour, minute] =
-    time.split(":").map(Number);
+  return value
+    .split("T")[1]
+    .slice(0, 5);
 
-  const date = new Date();
-
-  date.setHours(
-    hour,
-    minute,
-    0,
-    0
-  );
-
-  return new Intl.DateTimeFormat(
-    "en-GB",
-    {
-      hour: "2-digit",
-      minute: "2-digit"
-    }
-  ).format(date);
 }
 
 
-// =====================================================
+// =============================================
 // WEATHER THEME
-// =====================================================
+// =============================================
 
-function applyWeatherTheme(theme) {
+function applyWeatherTheme(
+  theme
+) {
 
-  const themes = [
+  document.body.classList.remove(
+
     "weather-clear",
     "weather-cloudy",
     "weather-rain",
     "weather-snow",
     "weather-night"
-  ];
 
-  document.body.classList.remove(
-    ...themes
   );
 
-  document.body.classList.add(theme);
+
+  document.body.classList.add(
+    theme
+  );
+
 }
 
 
-// =====================================================
-// FIND CURRENT VISIBILITY
-// =====================================================
+// =============================================
+// VISIBILITY
+// =============================================
 
-function getCurrentVisibility(data) {
+function getVisibility(
+  data
+) {
 
   if (
     !data.hourly ||
-    !data.hourly.time ||
     !data.hourly.visibility
   ) {
+
     return null;
+
   }
+
 
   const currentTime =
     data.current.time;
 
-  let index =
-    data.hourly.time.indexOf(
-      currentTime
-    );
+
+  let closestIndex = 0;
+
+  let smallestDifference =
+    Infinity;
 
 
-  // If exact current hour cannot be found,
-  // use the closest available hourly value.
+  data.hourly.time.forEach(
+    (time, index) => {
 
-  if (index === -1) {
+      const difference =
+        Math.abs(
+          new Date(time) -
+          new Date(currentTime)
+        );
 
-    const currentDate =
-      new Date(currentTime).getTime();
 
-    let closestDifference =
-      Infinity;
+      if (
+        difference <
+        smallestDifference
+      ) {
 
-    data.hourly.time.forEach(
-      (time, i) => {
+        smallestDifference =
+          difference;
 
-        const difference =
-          Math.abs(
-            new Date(time).getTime()
-            - currentDate
-          );
-
-        if (
-          difference <
-          closestDifference
-        ) {
-
-          closestDifference =
-            difference;
-
-          index = i;
-        }
+        closestIndex =
+          index;
 
       }
-    );
 
-  }
+    }
+  );
 
 
   const metres =
-    data.hourly.visibility[index];
+    data.hourly
+      .visibility[
+        closestIndex
+      ];
+
 
   if (
-    metres === null ||
-    metres === undefined
+    metres === undefined ||
+    metres === null
   ) {
+
     return null;
+
   }
 
+
   return metres / 1000;
+
 }
 
 
-// =====================================================
+// =============================================
 // FETCH WEATHER
-// =====================================================
+// =============================================
 
-async function fetchWeather(location) {
+async function fetchWeather(
+  location
+) {
 
   showStatus(
     `Loading weather for ${location.name}...`
   );
 
-  setLoadingState(true);
+
+  setLoading(true);
 
 
   try {
@@ -528,21 +808,20 @@ async function fetchWeather(location) {
 
         forecast_days:
           "5"
+
       });
 
 
-    const url =
-      `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
-
-
     const response =
-      await fetch(url);
+      await fetch(
+        `https://api.open-meteo.com/v1/forecast?${params}`
+      );
 
 
     if (!response.ok) {
 
       throw new Error(
-        "Weather information could not be loaded."
+        "Weather service unavailable."
       );
 
     }
@@ -554,6 +833,7 @@ async function fetchWeather(location) {
 
     currentLocation =
       location;
+
 
     currentWeatherData =
       data;
@@ -567,6 +847,7 @@ async function fetchWeather(location) {
 
     renderWeather();
 
+
     hideStatus();
 
   }
@@ -575,8 +856,9 @@ async function fetchWeather(location) {
 
     console.error(error);
 
+
     showStatus(
-      "Unable to load the weather. Please try another city.",
+      "Unable to load weather. Please try again.",
       "error"
     );
 
@@ -584,16 +866,16 @@ async function fetchWeather(location) {
 
   finally {
 
-    setLoadingState(false);
+    setLoading(false);
 
   }
 
 }
 
 
-// =====================================================
+// =============================================
 // RENDER WEATHER
-// =====================================================
+// =============================================
 
 function renderWeather() {
 
@@ -601,15 +883,19 @@ function renderWeather() {
     !currentWeatherData ||
     !currentLocation
   ) {
+
     return;
+
   }
 
 
   const data =
     currentWeatherData;
 
+
   const current =
     data.current;
+
 
   const daily =
     data.daily;
@@ -627,26 +913,32 @@ function renderWeather() {
   );
 
 
-  // Location
-
   locationName.textContent =
     currentLocation.country
       ? `${currentLocation.name}, ${currentLocation.country}`
       : currentLocation.name;
 
 
-  // Date
-
-  currentDate.textContent =
-    formatDate(
-      current.time.slice(0, 10)
+  const currentDay =
+    current.time.slice(
+      0,
+      10
     );
 
 
-  // Current weather
+  currentDate.textContent =
+    formatDate(
+      currentDay
+    );
+
+
+  localTime.textContent =
+    `Local time ${current.time.slice(11, 16)}`;
+
 
   weatherIcon.textContent =
     weather.icon;
+
 
   weatherDescription.textContent =
     weather.description;
@@ -672,8 +964,6 @@ function renderWeather() {
     getTemperatureUnit();
 
 
-  // High / Low
-
   todayHigh.textContent =
     `${convertTemperature(
       daily.temperature_2m_max[0]
@@ -685,8 +975,6 @@ function renderWeather() {
       daily.temperature_2m_min[0]
     )}${getTemperatureUnit()}`;
 
-
-  // Details
 
   humidity.textContent =
     `${Math.round(
@@ -706,24 +994,24 @@ function renderWeather() {
     ).toFixed(1)} mm`;
 
 
-  const currentVisibility =
-    getCurrentVisibility(data);
+  const visibilityValue =
+    getVisibility(data);
 
 
   visibility.textContent =
-    currentVisibility !== null
-      ? `${currentVisibility.toFixed(1)} km`
+    visibilityValue !== null
+      ? `${visibilityValue.toFixed(1)} km`
       : "Unavailable";
 
 
   sunrise.textContent =
-    formatTime(
+    getTimeFromISO(
       daily.sunrise[0]
     );
 
 
   sunset.textContent =
-    formatTime(
+    getTimeFromISO(
       daily.sunset[0]
     );
 
@@ -737,9 +1025,9 @@ function renderWeather() {
 }
 
 
-// =====================================================
+// =============================================
 // FORECAST
-// =====================================================
+// =============================================
 
 function renderForecast() {
 
@@ -747,7 +1035,8 @@ function renderForecast() {
     currentWeatherData.daily;
 
 
-  forecastGrid.innerHTML = "";
+  forecastGrid.innerHTML =
+    "";
 
 
   daily.time.forEach(
@@ -768,6 +1057,10 @@ function renderForecast() {
 
       card.className =
         "forecast-card";
+
+
+      card.style.animationDelay =
+        `${index * 0.07}s`;
 
 
       const day =
@@ -791,6 +1084,7 @@ function renderForecast() {
 
       icon.className =
         "forecast-icon";
+
 
       icon.textContent =
         weather.icon;
@@ -828,7 +1122,9 @@ function renderForecast() {
       );
 
 
-      forecastGrid.appendChild(card);
+      forecastGrid.appendChild(
+        card
+      );
 
     }
   );
@@ -836,45 +1132,26 @@ function renderForecast() {
 }
 
 
-// =====================================================
-// LOADING EFFECT
-// =====================================================
+// =============================================
+// SEARCH API
+// =============================================
 
-function setLoadingState(loading) {
+async function searchCities(
+  query
+) {
 
-  const cards =
-    document.querySelectorAll(
-      ".current-weather-card, .detail-card"
-    );
-
-
-  cards.forEach(card => {
-
-    card.classList.toggle(
-      "loading-pulse",
-      loading
-    );
-
-  });
-
-}
-
-
-// =====================================================
-// GEOCODING SEARCH
-// =====================================================
-
-async function searchCities(query) {
-
-  const trimmed =
+  const city =
     query.trim();
 
 
-  if (trimmed.length < 2) {
+  if (
+    city.length < 2
+  ) {
 
     clearSuggestions();
 
     return;
+
   }
 
 
@@ -883,26 +1160,31 @@ async function searchCities(query) {
     const params =
       new URLSearchParams({
 
-        name: trimmed,
+        name:
+          city,
 
-        count: "5",
+        count:
+          "6",
 
-        language: "en",
+        language:
+          "en",
 
-        format: "json"
+        format:
+          "json"
+
       });
 
 
     const response =
       await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`
+        `https://geocoding-api.open-meteo.com/v1/search?${params}`
       );
 
 
     if (!response.ok) {
 
       throw new Error(
-        "Location search failed."
+        "Search failed"
       );
 
     }
@@ -929,13 +1211,16 @@ async function searchCities(query) {
 }
 
 
-// =====================================================
-// SEARCH SUGGESTIONS
-// =====================================================
+// =============================================
+// SUGGESTIONS
+// =============================================
 
-function renderSuggestions(results) {
+function renderSuggestions(
+  results
+) {
 
-  suggestionsBox.innerHTML = "";
+  suggestionsBox.innerHTML =
+    "";
 
 
   if (!results.length) {
@@ -943,97 +1228,103 @@ function renderSuggestions(results) {
     clearSuggestions();
 
     return;
+
   }
 
 
-  results.forEach(result => {
+  results.forEach(
+    result => {
 
-    const button =
-      document.createElement(
-        "button"
+      const button =
+        document.createElement(
+          "button"
+        );
+
+
+      button.type =
+        "button";
+
+
+      button.className =
+        "suggestion-item";
+
+
+      const name =
+        document.createElement(
+          "strong"
+        );
+
+
+      name.textContent =
+        result.name;
+
+
+      const details =
+        document.createElement(
+          "span"
+        );
+
+
+      details.textContent =
+        [
+          result.admin1,
+          result.country
+        ]
+          .filter(Boolean)
+          .join(", ");
+
+
+      button.append(
+        name,
+        details
       );
 
 
-    button.type =
-      "button";
+      button.addEventListener(
+        "click",
+        () => {
 
-    button.className =
-      "suggestion-item";
+          const location = {
+
+            name:
+              result.name,
+
+            country:
+              result.country || "",
+
+            admin1:
+              result.admin1 || "",
+
+            latitude:
+              result.latitude,
+
+            longitude:
+              result.longitude
+
+          };
 
 
-    const main =
-      document.createElement(
-        "strong"
+          searchInput.value =
+            result.name;
+
+
+          clearSuggestions();
+
+
+          fetchWeather(
+            location
+          );
+
+        }
       );
 
 
-    main.textContent =
-      result.name;
-
-
-    const details =
-      document.createElement(
-        "span"
+      suggestionsBox.appendChild(
+        button
       );
 
-
-    const areas =
-      [
-        result.admin1,
-        result.country
-      ].filter(Boolean);
-
-
-    details.textContent =
-      areas.join(", ");
-
-
-    button.append(
-      main,
-      details
-    );
-
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const location = {
-
-          name:
-            result.name,
-
-          country:
-            result.country || "",
-
-          admin1:
-            result.admin1 || "",
-
-          latitude:
-            result.latitude,
-
-          longitude:
-            result.longitude
-        };
-
-
-        searchInput.value =
-          result.name;
-
-
-        clearSuggestions();
-
-        fetchWeather(location);
-
-      }
-    );
-
-
-    suggestionsBox.appendChild(
-      button
-    );
-
-  });
+    }
+  );
 
 
   suggestionsBox.classList.add(
@@ -1045,7 +1336,9 @@ function renderSuggestions(results) {
 
 function clearSuggestions() {
 
-  suggestionsBox.innerHTML = "";
+  suggestionsBox.innerHTML =
+    "";
+
 
   suggestionsBox.classList.remove(
     "show"
@@ -1054,44 +1347,42 @@ function clearSuggestions() {
 }
 
 
-// =====================================================
-// FIND FIRST SEARCH RESULT
-// =====================================================
+// =============================================
+// SEARCH FORM
+// =============================================
 
-async function findCity(query) {
-
-  const trimmed =
-    query.trim();
-
-
-  if (!trimmed) {
-    return null;
-  }
-
+async function findCity(
+  query
+) {
 
   const params =
     new URLSearchParams({
 
-      name: trimmed,
+      name:
+        query,
 
-      count: "1",
+      count:
+        "1",
 
-      language: "en",
+      language:
+        "en",
 
-      format: "json"
+      format:
+        "json"
+
     });
 
 
   const response =
     await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`
+      `https://geocoding-api.open-meteo.com/v1/search?${params}`
     );
 
 
   if (!response.ok) {
 
     throw new Error(
-      "City search failed."
+      "Search unavailable."
     );
 
   }
@@ -1131,20 +1422,18 @@ async function findCity(query) {
 
     longitude:
       result.longitude
+
   };
 
 }
 
-
-// =====================================================
-// SEARCH FORM
-// =====================================================
 
 searchForm.addEventListener(
   "submit",
   async event => {
 
     event.preventDefault();
+
 
     clearSuggestions();
 
@@ -1166,7 +1455,9 @@ searchForm.addEventListener(
     try {
 
       const location =
-        await findCity(query);
+        await findCity(
+          query
+        );
 
 
       if (!location) {
@@ -1177,6 +1468,7 @@ searchForm.addEventListener(
         );
 
         return;
+
       }
 
 
@@ -1190,6 +1482,7 @@ searchForm.addEventListener(
 
       console.error(error);
 
+
       showStatus(
         "Unable to search for that city.",
         "error"
@@ -1201,9 +1494,9 @@ searchForm.addEventListener(
 );
 
 
-// =====================================================
+// =============================================
 // LIVE SEARCH
-// =====================================================
+// =============================================
 
 searchInput.addEventListener(
   "input",
@@ -1214,15 +1507,13 @@ searchInput.addEventListener(
     );
 
 
-    const query =
-      searchInput.value;
-
-
     searchTimer =
       setTimeout(
         () => {
 
-          searchCities(query);
+          searchCities(
+            searchInput.value
+          );
 
         },
         350
@@ -1231,8 +1522,6 @@ searchInput.addEventListener(
   }
 );
 
-
-// Close suggestions when clicking outside
 
 document.addEventListener(
   "click",
@@ -1255,9 +1544,9 @@ document.addEventListener(
 );
 
 
-// =====================================================
-// CURRENT LOCATION
-// =====================================================
+// =============================================
+// GEOLOCATION
+// =============================================
 
 locationButton.addEventListener(
   "click",
@@ -1268,81 +1557,110 @@ locationButton.addEventListener(
     ) {
 
       showStatus(
-        "Location access is not supported by your browser.",
+        "Your browser does not support location access.",
         "error"
       );
 
       return;
+
     }
 
 
     showStatus(
-      "Getting your current location..."
+      "Finding your location..."
     );
 
 
-    navigator.geolocation.getCurrentPosition(
+    navigator.geolocation
+      .getCurrentPosition(
 
-      async position => {
+        async position => {
 
-        const latitude =
-          position.coords.latitude;
+          const location = {
 
-        const longitude =
-          position.coords.longitude;
+            name:
+              "Current Location",
 
+            country:
+              "",
 
-        const location = {
+            latitude:
+              position.coords.latitude,
 
-          name:
-            "Current Location",
+            longitude:
+              position.coords.longitude
 
-          country:
-            "",
-
-          latitude,
-
-          longitude
-        };
+          };
 
 
-        await fetchWeather(
-          location
-        );
+          await fetchWeather(
+            location
+          );
 
-      },
-
-
-      () => {
-
-        showStatus(
-          "Location access was not available. Search for your city instead.",
-          "error"
-        );
-
-      },
+        },
 
 
-      {
-        enableHighAccuracy:
-          false,
+        () => {
 
-        timeout:
-          10000,
+          showStatus(
+            "Location permission was not available. Search for your city instead.",
+            "error"
+          );
 
-        maximumAge:
-          300000
-      }
+        },
 
+
+        {
+          enableHighAccuracy:
+            false,
+
+          timeout:
+            10000,
+
+          maximumAge:
+            300000
+        }
+
+      );
+
+  }
+);
+
+
+// =============================================
+// REFRESH
+// =============================================
+
+refreshButton.addEventListener(
+  "click",
+  async () => {
+
+    if (!currentLocation) {
+      return;
+    }
+
+
+    refreshButton.classList.add(
+      "loading-pulse"
+    );
+
+
+    await fetchWeather(
+      currentLocation
+    );
+
+
+    refreshButton.classList.remove(
+      "loading-pulse"
     );
 
   }
 );
 
 
-// =====================================================
-// TEMPERATURE UNIT TOGGLE
-// =====================================================
+// =============================================
+// UNIT BUTTON
+// =============================================
 
 unitButton.addEventListener(
   "click",
@@ -1354,13 +1672,21 @@ unitButton.addEventListener(
         : "C";
 
 
+    localStorage.setItem(
+      UNIT_KEY,
+      temperatureMode
+    );
+
+
     unitButton.textContent =
       temperatureMode === "C"
         ? "°C"
         : "°F";
 
 
-    if (currentWeatherData) {
+    if (
+      currentWeatherData
+    ) {
 
       renderWeather();
 
@@ -1370,9 +1696,9 @@ unitButton.addEventListener(
 );
 
 
-// =====================================================
+// =============================================
 // FAVOURITES
-// =====================================================
+// =============================================
 
 function getFavourites() {
 
@@ -1380,7 +1706,7 @@ function getFavourites() {
 
     return JSON.parse(
       localStorage.getItem(
-        STORAGE_KEY
+        FAVOURITES_KEY
       )
     ) || [];
 
@@ -1397,497 +1723,3 @@ function getFavourites() {
 
 function saveFavourites(
   favourites
-) {
-
-  localStorage.setItem(
-    STORAGE_KEY,
-    JSON.stringify(
-      favourites
-    )
-  );
-
-}
-
-
-function locationKey(location) {
-
-  return [
-    Number(
-      location.latitude
-    ).toFixed(4),
-
-    Number(
-      location.longitude
-    ).toFixed(4)
-  ].join(",");
-
-}
-
-
-function isFavourite(location) {
-
-  if (!location) {
-    return false;
-  }
-
-
-  const key =
-    locationKey(location);
-
-
-  return getFavourites().some(
-    favourite =>
-      locationKey(favourite)
-      === key
-  );
-
-}
-
-
-// =====================================================
-// FAVOURITE BUTTON
-// =====================================================
-
-function updateFavouriteButton() {
-
-  const active =
-    isFavourite(
-      currentLocation
-    );
-
-
-  favouriteButton.classList.toggle(
-    "active",
-    active
-  );
-
-
-  favouriteButton.textContent =
-    active
-      ? "★"
-      : "☆";
-
-
-  favouriteButton.title =
-    active
-      ? "Remove from favourites"
-      : "Add to favourites";
-
-
-  favouriteButton.setAttribute(
-    "aria-label",
-    favouriteButton.title
-  );
-
-}
-
-
-favouriteButton.addEventListener(
-  "click",
-  () => {
-
-    if (!currentLocation) {
-      return;
-    }
-
-
-    let favourites =
-      getFavourites();
-
-
-    const key =
-      locationKey(
-        currentLocation
-      );
-
-
-    const exists =
-      favourites.some(
-        location =>
-          locationKey(location)
-          === key
-      );
-
-
-    if (exists) {
-
-      favourites =
-        favourites.filter(
-          location =>
-            locationKey(location)
-            !== key
-        );
-
-    }
-
-    else {
-
-      favourites.push({
-
-        name:
-          currentLocation.name,
-
-        country:
-          currentLocation.country || "",
-
-        admin1:
-          currentLocation.admin1 || "",
-
-        latitude:
-          currentLocation.latitude,
-
-        longitude:
-          currentLocation.longitude
-      });
-
-    }
-
-
-    saveFavourites(
-      favourites
-    );
-
-
-    updateFavouriteButton();
-
-    renderFavourites();
-
-  }
-);
-
-
-// =====================================================
-// DISPLAY FAVOURITES
-// =====================================================
-
-function renderFavourites() {
-
-  const favourites =
-    getFavourites();
-
-
-  savedLocations.innerHTML = "";
-
-
-  if (!favourites.length) {
-
-    const empty =
-      document.createElement(
-        "div"
-      );
-
-
-    empty.className =
-      "empty-favourites";
-
-
-    empty.innerHTML = `
-      <span>☆</span>
-      <p>
-        Save your favourite cities for quick access.
-      </p>
-    `;
-
-
-    savedLocations.appendChild(
-      empty
-    );
-
-
-    return;
-  }
-
-
-  favourites.forEach(
-    favourite => {
-
-      const card =
-        document.createElement(
-          "article"
-        );
-
-
-      card.className =
-        "saved-location-card";
-
-
-      card.tabIndex = 0;
-
-
-      const name =
-        document.createElement(
-          "strong"
-        );
-
-
-      name.textContent =
-        favourite.name;
-
-
-      const locationDetails =
-        document.createElement(
-          "span"
-        );
-
-
-      locationDetails.textContent =
-        [
-          favourite.admin1,
-          favourite.country
-        ]
-          .filter(Boolean)
-          .join(", ")
-          || "Saved location";
-
-
-      const removeButton =
-        document.createElement(
-          "button"
-        );
-
-
-      removeButton.type =
-        "button";
-
-      removeButton.className =
-        "remove-favourite";
-
-      removeButton.textContent =
-        "×";
-
-      removeButton.title =
-        "Remove favourite";
-
-      removeButton.setAttribute(
-        "aria-label",
-        `Remove ${favourite.name} from favourites`
-      );
-
-
-      card.append(
-        name,
-        locationDetails,
-        removeButton
-      );
-
-
-      card.addEventListener(
-        "click",
-        event => {
-
-          if (
-            event.target ===
-            removeButton
-          ) {
-            return;
-          }
-
-
-          fetchWeather(
-            favourite
-          );
-
-        }
-      );
-
-
-      card.addEventListener(
-        "keydown",
-        event => {
-
-          if (
-            event.key === "Enter" ||
-            event.key === " "
-          ) {
-
-            event.preventDefault();
-
-            fetchWeather(
-              favourite
-            );
-
-          }
-
-        }
-      );
-
-
-      removeButton.addEventListener(
-        "click",
-        event => {
-
-          event.stopPropagation();
-
-
-          const updated =
-            getFavourites().filter(
-              location =>
-                locationKey(location)
-                !==
-                locationKey(
-                  favourite
-                )
-            );
-
-
-          saveFavourites(
-            updated
-          );
-
-
-          renderFavourites();
-
-          updateFavouriteButton();
-
-        }
-      );
-
-
-      savedLocations.appendChild(
-        card
-      );
-
-    }
-  );
-
-}
-
-
-// =====================================================
-// INTERACTIVE WEATHER CARD
-// =====================================================
-
-const weatherCard =
-  document.querySelector(
-    ".current-weather-card"
-  );
-
-
-if (
-  weatherCard &&
-  window.matchMedia(
-    "(hover: hover) and (pointer: fine)"
-  ).matches &&
-  !window.matchMedia(
-    "(prefers-reduced-motion: reduce)"
-  ).matches
-) {
-
-  weatherCard.addEventListener(
-    "mousemove",
-    event => {
-
-      const rect =
-        weatherCard.getBoundingClientRect();
-
-
-      const x =
-        event.clientX
-        - rect.left;
-
-
-      const y =
-        event.clientY
-        - rect.top;
-
-
-      const rotateY =
-        (
-          x / rect.width
-          - 0.5
-        ) * 4;
-
-
-      const rotateX =
-        (
-          0.5
-          - y / rect.height
-        ) * 4;
-
-
-      weatherCard.style.transform =
-        `
-        perspective(1000px)
-        rotateX(${rotateX}deg)
-        rotateY(${rotateY}deg)
-        translateY(-4px)
-        `;
-
-    }
-  );
-
-
-  weatherCard.addEventListener(
-    "mouseleave",
-    () => {
-
-      weatherCard.style.transform =
-        "";
-
-    }
-  );
-
-}
-
-
-// =====================================================
-// INITIAL LOAD
-// =====================================================
-
-function getLastLocation() {
-
-  try {
-
-    const saved =
-      JSON.parse(
-        localStorage.getItem(
-          LAST_LOCATION_KEY
-        )
-      );
-
-
-    if (
-      saved &&
-      saved.latitude !== undefined &&
-      saved.longitude !== undefined
-    ) {
-
-      return saved;
-
-    }
-
-  }
-
-  catch {
-
-    // Ignore invalid stored data.
-
-  }
-
-
-  return null;
-}
-
-
-async function initialiseApp() {
-
-  renderFavourites();
-
-
-  unitButton.textContent =
-    "°C";
-
-
-  const lastLocation =
-    getLastLocation();
-
-
-  await fetchWeather(
-    lastLocation ||
-    defaultLocation
-  );
-
-}
-
-
-initialiseApp();
