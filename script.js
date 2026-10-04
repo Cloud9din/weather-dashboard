@@ -1,6 +1,12 @@
-// =============================================
+// =====================================================
 // SKYCAST WEATHER DASHBOARD
-// =============================================
+// Live weather data powered by Open-Meteo
+// =====================================================
+
+
+// =====================================================
+// DOM ELEMENTS
+// =====================================================
 
 const searchForm =
   document.getElementById(
@@ -55,6 +61,11 @@ const currentDate =
 const localTime =
   document.getElementById(
     "local-time"
+  );
+
+const lastUpdated =
+  document.getElementById(
+    "last-updated"
   );
 
 const weatherIcon =
@@ -127,6 +138,11 @@ const sunset =
     "sunset"
   );
 
+const hourlyForecast =
+  document.getElementById(
+    "hourly-forecast"
+  );
+
 const forecastGrid =
   document.getElementById(
     "forecast-grid"
@@ -137,11 +153,20 @@ const savedLocations =
     "saved-locations"
   );
 
+const weatherEffects =
+  document.getElementById(
+    "weather-effects"
+  );
+
 const weatherCard =
   document.getElementById(
     "current-weather-card"
   );
 
+
+// =====================================================
+// STORAGE
+// =====================================================
 
 const FAVOURITES_KEY =
   "skycastFavourites";
@@ -152,6 +177,10 @@ const LAST_LOCATION_KEY =
 const UNIT_KEY =
   "skycastUnit";
 
+
+// =====================================================
+// APP STATE
+// =====================================================
 
 let currentLocation = null;
 
@@ -165,9 +194,9 @@ let temperatureMode =
 let searchTimer;
 
 
-// =============================================
+// =====================================================
 // DEFAULT LOCATION
-// =============================================
+// =====================================================
 
 const defaultLocation = {
 
@@ -189,17 +218,17 @@ const defaultLocation = {
 };
 
 
-// =============================================
-// TEMPERATURE
-// =============================================
+// =====================================================
+// TEMPERATURE FUNCTIONS
+// =====================================================
 
 function convertTemperature(
-  temperature
+  value
 ) {
 
   if (
-    temperature === null ||
-    temperature === undefined
+    value === null ||
+    value === undefined
   ) {
 
     return "--";
@@ -212,14 +241,14 @@ function convertTemperature(
   ) {
 
     return Math.round(
-      temperature * 9 / 5 + 32
+      value * 9 / 5 + 32
     );
 
   }
 
 
   return Math.round(
-    temperature
+    value
   );
 
 }
@@ -234,9 +263,9 @@ function getTemperatureUnit() {
 }
 
 
-// =============================================
-// WEATHER CODE
-// =============================================
+// =====================================================
+// WEATHER CODE INFORMATION
+// =====================================================
 
 function getWeatherInfo(
   code,
@@ -513,9 +542,9 @@ function getWeatherInfo(
 }
 
 
-// =============================================
-// STATUS
-// =============================================
+// =====================================================
+// STATUS MESSAGE
+// =====================================================
 
 function showStatus(
   message,
@@ -542,15 +571,19 @@ function hideStatus() {
 }
 
 
-// =============================================
-// DATE
-// =============================================
+// =====================================================
+// DATE FUNCTIONS
+// =====================================================
 
 function formatDate(
   dateString
 ) {
 
-  const parts =
+  const [
+    year,
+    month,
+    day
+  ] =
     dateString
       .split("-")
       .map(Number);
@@ -559,9 +592,9 @@ function formatDate(
   const date =
     new Date(
       Date.UTC(
-        parts[0],
-        parts[1] - 1,
-        parts[2]
+        year,
+        month - 1,
+        day
       )
     );
 
@@ -604,7 +637,11 @@ function formatForecastDay(
   }
 
 
-  const parts =
+  const [
+    year,
+    month,
+    day
+  ] =
     dateString
       .split("-")
       .map(Number);
@@ -613,9 +650,9 @@ function formatForecastDay(
   const date =
     new Date(
       Date.UTC(
-        parts[0],
-        parts[1] - 1,
-        parts[2]
+        year,
+        month - 1,
+        day
       )
     );
 
@@ -643,16 +680,191 @@ function getTimeFromISO(
   }
 
 
-  return value
-    .split("T")[1]
-    .slice(0, 5);
+  const parts =
+    value.split("T");
+
+
+  if (parts.length < 2) {
+    return "--:--";
+  }
+
+
+  return parts[1].slice(
+    0,
+    5
+  );
 
 }
 
 
-// =============================================
-// WEATHER THEME
-// =============================================
+// =====================================================
+// DYNAMIC WEATHER EFFECTS
+// =====================================================
+
+function createWeatherEffects(
+  theme
+) {
+
+  weatherEffects.innerHTML =
+    "";
+
+
+  if (
+    window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches
+  ) {
+
+    return;
+
+  }
+
+
+  // Rain
+
+  if (
+    theme ===
+    "weather-rain"
+  ) {
+
+    for (
+      let i = 0;
+      i < 45;
+      i++
+    ) {
+
+      const drop =
+        document.createElement(
+          "span"
+        );
+
+
+      drop.className =
+        "rain-drop";
+
+
+      drop.style.left =
+        `${Math.random() * 100}%`;
+
+
+      drop.style.animationDuration =
+        `${0.6 + Math.random()}s`;
+
+
+      drop.style.animationDelay =
+        `${Math.random() * 2}s`;
+
+
+      weatherEffects.appendChild(
+        drop
+      );
+
+    }
+
+  }
+
+
+  // Snow
+
+  if (
+    theme ===
+    "weather-snow"
+  ) {
+
+    for (
+      let i = 0;
+      i < 35;
+      i++
+    ) {
+
+      const snow =
+        document.createElement(
+          "span"
+        );
+
+
+      snow.className =
+        "snowflake";
+
+
+      snow.textContent =
+        "❄";
+
+
+      snow.style.left =
+        `${Math.random() * 100}%`;
+
+
+      snow.style.fontSize =
+        `${8 + Math.random() * 14}px`;
+
+
+      snow.style.animationDuration =
+        `${5 + Math.random() * 7}s`;
+
+
+      snow.style.animationDelay =
+        `${Math.random() * 5}s`;
+
+
+      weatherEffects.appendChild(
+        snow
+      );
+
+    }
+
+  }
+
+
+  // Stars
+
+  if (
+    theme ===
+    "weather-night"
+  ) {
+
+    for (
+      let i = 0;
+      i < 45;
+      i++
+    ) {
+
+      const star =
+        document.createElement(
+          "span"
+        );
+
+
+      star.className =
+        "star";
+
+
+      star.style.left =
+        `${Math.random() * 100}%`;
+
+
+      star.style.top =
+        `${Math.random() * 75}%`;
+
+
+      star.style.animationDelay =
+        `${Math.random() * 3}s`;
+
+
+      weatherEffects.appendChild(
+        star
+      );
+
+    }
+
+  }
+
+}
+
+
+// =====================================================
+// APPLY WEATHER THEME
+// =====================================================
 
 function applyWeatherTheme(
   theme
@@ -673,19 +885,25 @@ function applyWeatherTheme(
     theme
   );
 
+
+  createWeatherEffects(
+    theme
+  );
+
 }
 
 
-// =============================================
+// =====================================================
 // VISIBILITY
-// =============================================
+// =====================================================
 
-function getVisibility(
+function getCurrentVisibility(
   data
 ) {
 
   if (
     !data.hourly ||
+    !data.hourly.time ||
     !data.hourly.visibility
   ) {
 
@@ -695,12 +913,16 @@ function getVisibility(
 
 
   const currentTime =
-    data.current.time;
+    new Date(
+      data.current.time
+    ).getTime();
 
 
-  let closestIndex = 0;
+  let closestIndex =
+    0;
 
-  let smallestDifference =
+
+  let closestDifference =
     Infinity;
 
 
@@ -709,17 +931,18 @@ function getVisibility(
 
       const difference =
         Math.abs(
-          new Date(time) -
-          new Date(currentTime)
+          new Date(time).getTime()
+          -
+          currentTime
         );
 
 
       if (
         difference <
-        smallestDifference
+        closestDifference
       ) {
 
-        smallestDifference =
+        closestDifference =
           difference;
 
         closestIndex =
@@ -732,10 +955,9 @@ function getVisibility(
 
 
   const metres =
-    data.hourly
-      .visibility[
-        closestIndex
-      ];
+    data.hourly.visibility[
+      closestIndex
+    ];
 
 
   if (
@@ -753,9 +975,9 @@ function getVisibility(
 }
 
 
-// =============================================
-// FETCH WEATHER
-// =============================================
+// =====================================================
+// FETCH LIVE WEATHER
+// =====================================================
 
 async function fetchWeather(
   location
@@ -766,7 +988,9 @@ async function fetchWeather(
   );
 
 
-  setLoading(true);
+  setLoadingState(
+    true
+  );
 
 
   try {
@@ -792,7 +1016,11 @@ async function fetchWeather(
           ].join(","),
 
         hourly:
-          "visibility",
+          [
+            "visibility",
+            "temperature_2m",
+            "weather_code"
+          ].join(","),
 
         daily:
           [
@@ -812,16 +1040,18 @@ async function fetchWeather(
       });
 
 
+    const url =
+      `https://api.open-meteo.com/v1/forecast?${params.toString()}`;
+
+
     const response =
-      await fetch(
-        `https://api.open-meteo.com/v1/forecast?${params}`
-      );
+      await fetch(url);
 
 
     if (!response.ok) {
 
       throw new Error(
-        "Weather service unavailable."
+        "Unable to load weather."
       );
 
     }
@@ -841,7 +1071,9 @@ async function fetchWeather(
 
     localStorage.setItem(
       LAST_LOCATION_KEY,
-      JSON.stringify(location)
+      JSON.stringify(
+        location
+      )
     );
 
 
@@ -854,7 +1086,9 @@ async function fetchWeather(
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
 
 
     showStatus(
@@ -866,16 +1100,18 @@ async function fetchWeather(
 
   finally {
 
-    setLoading(false);
+    setLoadingState(
+      false
+    );
 
   }
 
 }
 
 
-// =============================================
+// =====================================================
 // RENDER WEATHER
-// =============================================
+// =====================================================
 
 function renderWeather() {
 
@@ -913,28 +1149,47 @@ function renderWeather() {
   );
 
 
+  // Location
+
   locationName.textContent =
     currentLocation.country
       ? `${currentLocation.name}, ${currentLocation.country}`
       : currentLocation.name;
 
 
-  const currentDay =
-    current.time.slice(
-      0,
-      10
-    );
-
+  // Date
 
   currentDate.textContent =
     formatDate(
-      currentDay
+      current.time.slice(
+        0,
+        10
+      )
     );
 
+
+  // Local Time
 
   localTime.textContent =
     `Local time ${current.time.slice(11, 16)}`;
 
+
+  // Last Updated
+
+  lastUpdated.textContent =
+    `Updated ${new Intl.DateTimeFormat(
+      "en-GB",
+      {
+        hour:
+          "2-digit",
+
+        minute:
+          "2-digit"
+      }
+    ).format(new Date())}`;
+
+
+  // Weather
 
   weatherIcon.textContent =
     weather.icon;
@@ -964,6 +1219,25 @@ function renderWeather() {
     getTemperatureUnit();
 
 
+  // Temperature Animation
+
+  currentTemperature
+    .classList.remove(
+      "temperature-pop"
+    );
+
+
+  void currentTemperature.offsetWidth;
+
+
+  currentTemperature
+    .classList.add(
+      "temperature-pop"
+    );
+
+
+  // High / Low
+
   todayHigh.textContent =
     `${convertTemperature(
       daily.temperature_2m_max[0]
@@ -975,6 +1249,8 @@ function renderWeather() {
       daily.temperature_2m_min[0]
     )}${getTemperatureUnit()}`;
 
+
+  // Weather Details
 
   humidity.textContent =
     `${Math.round(
@@ -994,13 +1270,15 @@ function renderWeather() {
     ).toFixed(1)} mm`;
 
 
-  const visibilityValue =
-    getVisibility(data);
+  const currentVisibility =
+    getCurrentVisibility(
+      data
+    );
 
 
   visibility.textContent =
-    visibilityValue !== null
-      ? `${visibilityValue.toFixed(1)} km`
+    currentVisibility !== null
+      ? `${currentVisibility.toFixed(1)} km`
       : "Unavailable";
 
 
@@ -1016,6 +1294,8 @@ function renderWeather() {
     );
 
 
+  renderHourlyForecast();
+
   renderForecast();
 
   updateFavouriteButton();
@@ -1025,9 +1305,181 @@ function renderWeather() {
 }
 
 
-// =============================================
-// FORECAST
-// =============================================
+// =====================================================
+// HOURLY FORECAST
+// =====================================================
+
+function renderHourlyForecast() {
+
+  const hourly =
+    currentWeatherData.hourly;
+
+
+  if (
+    !hourly ||
+    !hourly.time ||
+    !hourly.temperature_2m ||
+    !hourly.weather_code
+  ) {
+
+    return;
+
+  }
+
+
+  hourlyForecast.innerHTML =
+    "";
+
+
+  const currentTime =
+    new Date(
+      currentWeatherData
+        .current.time
+    ).getTime();
+
+
+  let startIndex =
+    hourly.time.findIndex(
+      time =>
+        new Date(time)
+          .getTime()
+        >=
+        currentTime
+    );
+
+
+  if (
+    startIndex === -1
+  ) {
+
+    startIndex =
+      0;
+
+  }
+
+
+  const endIndex =
+    Math.min(
+      startIndex + 10,
+      hourly.time.length
+    );
+
+
+  for (
+    let i = startIndex;
+    i < endIndex;
+    i++
+  ) {
+
+    const weather =
+      getWeatherInfo(
+        hourly.weather_code[i],
+        1
+      );
+
+
+    const card =
+      document.createElement(
+        "article"
+      );
+
+
+    card.className =
+      "hour-card";
+
+
+    if (
+      i === startIndex
+    ) {
+
+      card.classList.add(
+        "current-hour"
+      );
+
+    }
+
+
+    card.style.animationDelay =
+      `${(
+        i - startIndex
+      ) * 0.05}s`;
+
+
+    const time =
+      hourly.time[i]
+        .split("T")[1]
+        .slice(0, 5);
+
+
+    const timeLabel =
+      i === startIndex
+        ? "Now"
+        : time;
+
+
+    const timeElement =
+      document.createElement(
+        "span"
+      );
+
+
+    timeElement.className =
+      "hour-time";
+
+
+    timeElement.textContent =
+      timeLabel;
+
+
+    const icon =
+      document.createElement(
+        "div"
+      );
+
+
+    icon.className =
+      "hour-icon";
+
+
+    icon.textContent =
+      weather.icon;
+
+
+    const temperature =
+      document.createElement(
+        "strong"
+      );
+
+
+    temperature.className =
+      "hour-temperature";
+
+
+    temperature.textContent =
+      `${convertTemperature(
+        hourly.temperature_2m[i]
+      )}${getTemperatureUnit()}`;
+
+
+    card.append(
+      timeElement,
+      icon,
+      temperature
+    );
+
+
+    hourlyForecast.appendChild(
+      card
+    );
+
+  }
+
+}
+
+
+// =====================================================
+// FIVE DAY FORECAST
+// =====================================================
 
 function renderForecast() {
 
@@ -1040,11 +1492,16 @@ function renderForecast() {
 
 
   daily.time.forEach(
-    (date, index) => {
+    (
+      date,
+      index
+    ) => {
 
       const weather =
         getWeatherInfo(
-          daily.weather_code[index],
+          daily.weather_code[
+            index
+          ],
           1
         );
 
@@ -1098,7 +1555,9 @@ function renderForecast() {
 
       high.textContent =
         `${convertTemperature(
-          daily.temperature_2m_max[index]
+          daily.temperature_2m_max[
+            index
+          ]
         )}${getTemperatureUnit()}`;
 
 
@@ -1110,7 +1569,9 @@ function renderForecast() {
 
       low.textContent =
         `Low ${convertTemperature(
-          daily.temperature_2m_min[index]
+          daily.temperature_2m_min[
+            index
+          ]
         )}${getTemperatureUnit()}`;
 
 
@@ -1132,9 +1593,41 @@ function renderForecast() {
 }
 
 
-// =============================================
-// SEARCH API
-// =============================================
+// =====================================================
+// LOADING STATE
+// =====================================================
+
+function setLoadingState(
+  loading
+) {
+
+  const cards =
+    document.querySelectorAll(
+      ".current-weather-card, .detail-card"
+    );
+
+
+  cards.forEach(
+    card => {
+
+      card.classList.toggle(
+        "loading-pulse",
+        loading
+      );
+
+    }
+  );
+
+
+  refreshButton.disabled =
+    loading;
+
+}
+
+
+// =====================================================
+// CITY SEARCH
+// =====================================================
 
 async function searchCities(
   query
@@ -1177,14 +1670,14 @@ async function searchCities(
 
     const response =
       await fetch(
-        `https://geocoding-api.open-meteo.com/v1/search?${params}`
+        `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`
       );
 
 
     if (!response.ok) {
 
       throw new Error(
-        "Search failed"
+        "Search failed."
       );
 
     }
@@ -1202,7 +1695,10 @@ async function searchCities(
 
   catch (error) {
 
-    console.error(error);
+    console.error(
+      error
+    );
+
 
     clearSuggestions();
 
@@ -1211,9 +1707,9 @@ async function searchCities(
 }
 
 
-// =============================================
-// SUGGESTIONS
-// =============================================
+// =====================================================
+// SEARCH SUGGESTIONS
+// =====================================================
 
 function renderSuggestions(
   results
@@ -1223,7 +1719,9 @@ function renderSuggestions(
     "";
 
 
-  if (!results.length) {
+  if (
+    !results.length
+  ) {
 
     clearSuggestions();
 
@@ -1249,13 +1747,13 @@ function renderSuggestions(
         "suggestion-item";
 
 
-      const name =
+      const main =
         document.createElement(
           "strong"
         );
 
 
-      name.textContent =
+      main.textContent =
         result.name;
 
 
@@ -1275,7 +1773,7 @@ function renderSuggestions(
 
 
       button.append(
-        name,
+        main,
         details
       );
 
@@ -1347,9 +1845,9 @@ function clearSuggestions() {
 }
 
 
-// =============================================
-// SEARCH FORM
-// =============================================
+// =====================================================
+// FIND FIRST CITY
+// =====================================================
 
 async function findCity(
   query
@@ -1359,7 +1857,7 @@ async function findCity(
     new URLSearchParams({
 
       name:
-        query,
+        query.trim(),
 
       count:
         "1",
@@ -1375,7 +1873,7 @@ async function findCity(
 
   const response =
     await fetch(
-      `https://geocoding-api.open-meteo.com/v1/search?${params}`
+      `https://geocoding-api.open-meteo.com/v1/search?${params.toString()}`
     );
 
 
@@ -1428,6 +1926,10 @@ async function findCity(
 }
 
 
+// =====================================================
+// SEARCH FORM
+// =====================================================
+
 searchForm.addEventListener(
   "submit",
   async event => {
@@ -1467,6 +1969,7 @@ searchForm.addEventListener(
           "error"
         );
 
+
         return;
 
       }
@@ -1480,7 +1983,9 @@ searchForm.addEventListener(
 
     catch (error) {
 
-      console.error(error);
+      console.error(
+        error
+      );
 
 
       showStatus(
@@ -1494,9 +1999,9 @@ searchForm.addEventListener(
 );
 
 
-// =============================================
+// =====================================================
 // LIVE SEARCH
-// =============================================
+// =====================================================
 
 searchInput.addEventListener(
   "input",
@@ -1523,6 +2028,8 @@ searchInput.addEventListener(
 );
 
 
+// Close suggestions if clicking outside
+
 document.addEventListener(
   "click",
   event => {
@@ -1530,7 +2037,8 @@ document.addEventListener(
     if (
       !searchInput.contains(
         event.target
-      ) &&
+      )
+      &&
       !suggestionsBox.contains(
         event.target
       )
@@ -1544,9 +2052,9 @@ document.addEventListener(
 );
 
 
-// =============================================
-// GEOLOCATION
-// =============================================
+// =====================================================
+// CURRENT LOCATION
+// =====================================================
 
 locationButton.addEventListener(
   "click",
@@ -1560,6 +2068,7 @@ locationButton.addEventListener(
         "Your browser does not support location access.",
         "error"
       );
+
 
       return;
 
@@ -1582,6 +2091,9 @@ locationButton.addEventListener(
               "Current Location",
 
             country:
+              "",
+
+            admin1:
               "",
 
             latitude:
@@ -1627,22 +2139,27 @@ locationButton.addEventListener(
 );
 
 
-// =============================================
-// REFRESH
-// =============================================
+// =====================================================
+// REFRESH BUTTON
+// =====================================================
 
 refreshButton.addEventListener(
   "click",
   async () => {
 
-    if (!currentLocation) {
+    if (
+      !currentLocation
+    ) {
+
       return;
+
     }
 
 
-    refreshButton.classList.add(
-      "loading-pulse"
-    );
+    refreshButton
+      .classList.add(
+        "loading-pulse"
+      );
 
 
     await fetchWeather(
@@ -1650,17 +2167,18 @@ refreshButton.addEventListener(
     );
 
 
-    refreshButton.classList.remove(
-      "loading-pulse"
-    );
+    refreshButton
+      .classList.remove(
+        "loading-pulse"
+      );
 
   }
 );
 
 
-// =============================================
-// UNIT BUTTON
-// =============================================
+// =====================================================
+// TEMPERATURE UNIT TOGGLE
+// =====================================================
 
 unitButton.addEventListener(
   "click",
@@ -1696,9 +2214,9 @@ unitButton.addEventListener(
 );
 
 
-// =============================================
+// =====================================================
 // FAVOURITES
-// =============================================
+// =====================================================
 
 function getFavourites() {
 
@@ -1723,3 +2241,568 @@ function getFavourites() {
 
 function saveFavourites(
   favourites
+) {
+
+  localStorage.setItem(
+    FAVOURITES_KEY,
+    JSON.stringify(
+      favourites
+    )
+  );
+
+}
+
+
+function locationKey(
+  location
+) {
+
+  return [
+    Number(
+      location.latitude
+    ).toFixed(4),
+
+    Number(
+      location.longitude
+    ).toFixed(4)
+  ].join(",");
+
+}
+
+
+function isFavourite(
+  location
+) {
+
+  if (!location) {
+    return false;
+  }
+
+
+  const key =
+    locationKey(
+      location
+    );
+
+
+  return getFavourites()
+    .some(
+      favourite =>
+        locationKey(
+          favourite
+        )
+        ===
+        key
+    );
+
+}
+
+
+// =====================================================
+// FAVOURITE BUTTON
+// =====================================================
+
+function updateFavouriteButton() {
+
+  const active =
+    isFavourite(
+      currentLocation
+    );
+
+
+  favouriteButton
+    .classList.toggle(
+      "active",
+      active
+    );
+
+
+  favouriteButton.textContent =
+    active
+      ? "★"
+      : "☆";
+
+
+  favouriteButton.title =
+    active
+      ? "Remove from favourites"
+      : "Add to favourites";
+
+
+  favouriteButton.setAttribute(
+    "aria-label",
+    favouriteButton.title
+  );
+
+}
+
+
+favouriteButton.addEventListener(
+  "click",
+  () => {
+
+    if (
+      !currentLocation
+    ) {
+
+      return;
+
+    }
+
+
+    let favourites =
+      getFavourites();
+
+
+    const key =
+      locationKey(
+        currentLocation
+      );
+
+
+    const exists =
+      favourites.some(
+        location =>
+          locationKey(
+            location
+          )
+          ===
+          key
+      );
+
+
+    if (exists) {
+
+      favourites =
+        favourites.filter(
+          location =>
+            locationKey(
+              location
+            )
+            !==
+            key
+        );
+
+    }
+
+    else {
+
+      favourites.push({
+
+        name:
+          currentLocation.name,
+
+        country:
+          currentLocation.country || "",
+
+        admin1:
+          currentLocation.admin1 || "",
+
+        latitude:
+          currentLocation.latitude,
+
+        longitude:
+          currentLocation.longitude
+
+      });
+
+    }
+
+
+    saveFavourites(
+      favourites
+    );
+
+
+    updateFavouriteButton();
+
+    renderFavourites();
+
+  }
+);
+
+
+// =====================================================
+// RENDER FAVOURITES
+// =====================================================
+
+function renderFavourites() {
+
+  const favourites =
+    getFavourites();
+
+
+  savedLocations.innerHTML =
+    "";
+
+
+  if (
+    !favourites.length
+  ) {
+
+    const empty =
+      document.createElement(
+        "div"
+      );
+
+
+    empty.className =
+      "empty-favourites";
+
+
+    const star =
+      document.createElement(
+        "span"
+      );
+
+
+    star.textContent =
+      "☆";
+
+
+    const text =
+      document.createElement(
+        "p"
+      );
+
+
+    text.textContent =
+      "Save your favourite cities for quick access.";
+
+
+    empty.append(
+      star,
+      text
+    );
+
+
+    savedLocations.appendChild(
+      empty
+    );
+
+
+    return;
+
+  }
+
+
+  favourites.forEach(
+    favourite => {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+
+      card.className =
+        "saved-location-card";
+
+
+      card.tabIndex =
+        0;
+
+
+      const name =
+        document.createElement(
+          "strong"
+        );
+
+
+      name.textContent =
+        favourite.name;
+
+
+      const details =
+        document.createElement(
+          "span"
+        );
+
+
+      details.textContent =
+        [
+          favourite.admin1,
+          favourite.country
+        ]
+          .filter(Boolean)
+          .join(", ")
+        ||
+        "Saved location";
+
+
+      const removeButton =
+        document.createElement(
+          "button"
+        );
+
+
+      removeButton.type =
+        "button";
+
+
+      removeButton.className =
+        "remove-favourite";
+
+
+      removeButton.textContent =
+        "×";
+
+
+      removeButton.title =
+        "Remove favourite";
+
+
+      removeButton.setAttribute(
+        "aria-label",
+        `Remove ${favourite.name} from favourites`
+      );
+
+
+      card.append(
+        name,
+        details,
+        removeButton
+      );
+
+
+      card.addEventListener(
+        "click",
+        event => {
+
+          if (
+            event.target ===
+            removeButton
+          ) {
+
+            return;
+
+          }
+
+
+          fetchWeather(
+            favourite
+          );
+
+        }
+      );
+
+
+      card.addEventListener(
+        "keydown",
+        event => {
+
+          if (
+            event.key ===
+            "Enter"
+            ||
+            event.key ===
+            " "
+          ) {
+
+            event.preventDefault();
+
+
+            fetchWeather(
+              favourite
+            );
+
+          }
+
+        }
+      );
+
+
+      removeButton
+        .addEventListener(
+          "click",
+          event => {
+
+            event.stopPropagation();
+
+
+            const updated =
+              getFavourites()
+                .filter(
+                  location =>
+                    locationKey(
+                      location
+                    )
+                    !==
+                    locationKey(
+                      favourite
+                    )
+                );
+
+
+            saveFavourites(
+              updated
+            );
+
+
+            renderFavourites();
+
+            updateFavouriteButton();
+
+          }
+        );
+
+
+      savedLocations.appendChild(
+        card
+      );
+
+    }
+  );
+
+}
+
+
+// =====================================================
+// INTERACTIVE WEATHER CARD
+// =====================================================
+
+if (
+  weatherCard
+  &&
+  window.matchMedia(
+    "(hover: hover) and (pointer: fine)"
+  ).matches
+  &&
+  !window.matchMedia(
+    "(prefers-reduced-motion: reduce)"
+  ).matches
+) {
+
+  weatherCard.addEventListener(
+    "mousemove",
+    event => {
+
+      const rect =
+        weatherCard
+          .getBoundingClientRect();
+
+
+      const x =
+        event.clientX
+        -
+        rect.left;
+
+
+      const y =
+        event.clientY
+        -
+        rect.top;
+
+
+      const rotateY =
+        (
+          x / rect.width
+          -
+          0.5
+        ) * 4;
+
+
+      const rotateX =
+        (
+          0.5
+          -
+          y / rect.height
+        ) * 4;
+
+
+      weatherCard.style.transform =
+        `
+        perspective(1000px)
+        rotateX(${rotateX}deg)
+        rotateY(${rotateY}deg)
+        translateY(-4px)
+        `;
+
+    }
+  );
+
+
+  weatherCard.addEventListener(
+    "mouseleave",
+    () => {
+
+      weatherCard.style.transform =
+        "";
+
+    }
+  );
+
+}
+
+
+// =====================================================
+// LAST LOCATION
+// =====================================================
+
+function getLastLocation() {
+
+  try {
+
+    const saved =
+      JSON.parse(
+        localStorage.getItem(
+          LAST_LOCATION_KEY
+        )
+      );
+
+
+    if (
+      saved
+      &&
+      saved.latitude !== undefined
+      &&
+      saved.longitude !== undefined
+    ) {
+
+      return saved;
+
+    }
+
+  }
+
+  catch {
+
+    return null;
+
+  }
+
+
+  return null;
+
+}
+
+
+// =====================================================
+// INITIALISE APP
+// =====================================================
+
+async function initialiseApp() {
+
+  renderFavourites();
+
+
+  unitButton.textContent =
+    temperatureMode === "C"
+      ? "°C"
+      : "°F";
+
+
+  const lastLocation =
+    getLastLocation();
+
+
+  await fetchWeather(
+    lastLocation
+    ||
+    defaultLocation
+  );
+
+}
+
+
+initialiseApp();
