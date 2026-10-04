@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -11,10 +12,18 @@
 
   <meta
     name="description"
-    content="SkyCast - a dynamic live weather dashboard built with HTML, CSS and JavaScript."
+    content="SkyCast is a dynamic weather dashboard providing live weather conditions, hourly forecasts and five-day forecasts for cities around the world."
   >
 
-  <title>SkyCast | Weather Dashboard</title>
+  <meta
+    name="theme-color"
+    content="#3478d4"
+  >
+
+  <title>SkyCast | Live Weather Dashboard</title>
+
+
+  <!-- Google Fonts -->
 
   <link
     rel="preconnect"
@@ -28,70 +37,121 @@
   >
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
     rel="stylesheet"
   >
+
+
+  <!-- Main CSS -->
 
   <link
     rel="stylesheet"
     href="style.css"
   >
+
 </head>
 
 
 <body class="weather-clear">
 
-  <!-- Background Decoration -->
+
+  <!-- =========================================
+       DYNAMIC WEATHER EFFECTS
+       Rain / Snow / Stars created by JavaScript
+  ========================================== -->
+
+  <div
+    id="weather-effects"
+    class="weather-effects"
+    aria-hidden="true"
+  ></div>
+
+
+
+  <!-- =========================================
+       BACKGROUND DECORATION
+  ========================================== -->
 
   <div
     class="background-effects"
     aria-hidden="true"
   >
+
     <span class="orb orb-one"></span>
+
     <span class="orb orb-two"></span>
-    <span class="floating-cloud cloud-one">☁</span>
-    <span class="floating-cloud cloud-two">☁</span>
+
+    <span class="floating-cloud cloud-one">
+      ☁
+    </span>
+
+    <span class="floating-cloud cloud-two">
+      ☁
+    </span>
+
   </div>
 
 
-  <!-- Header -->
+
+  <!-- =========================================
+       HEADER
+  ========================================== -->
 
   <header class="site-header">
 
     <div class="container header-content">
 
+
+      <!-- Logo -->
+
       <a
         href="index.html"
         class="logo"
+        aria-label="SkyCast home"
       >
-        <span class="logo-icon">☁</span>
+
+        <span class="logo-icon">
+          ☁
+        </span>
 
         <span>
           Sky<span>Cast</span>
         </span>
+
       </a>
 
 
+
+      <!-- Header Controls -->
+
       <div class="header-actions">
+
+
+        <!-- Refresh -->
 
         <button
           type="button"
           id="refresh-button"
           class="icon-button"
-          aria-label="Refresh weather"
+          aria-label="Refresh current weather"
           title="Refresh weather"
         >
           ↻
         </button>
 
+
+        <!-- Celsius / Fahrenheit -->
+
         <button
           type="button"
           id="unit-toggle"
           class="unit-toggle"
-          aria-label="Switch temperature unit"
+          aria-label="Change temperature unit"
+          title="Switch temperature unit"
         >
           °C
         </button>
+
 
       </div>
 
@@ -100,47 +160,85 @@
   </header>
 
 
+
+  <!-- =========================================
+       MAIN CONTENT
+  ========================================== -->
+
   <main>
 
-    <!-- Hero -->
+
+    <!-- =========================================
+         HERO
+    ========================================== -->
 
     <section class="hero">
 
       <div class="container">
 
+
         <div class="hero-content">
 
+
+          <!-- Live Label -->
+
           <span class="eyebrow">
-            <span class="live-dot"></span>
+
+            <span
+              class="live-dot"
+              aria-hidden="true"
+            ></span>
+
             LIVE WEATHER
+
           </span>
 
+
+
+          <!-- Main Heading -->
+
           <h1>
+
             Weather that moves
-            <span>with the sky.</span>
+
+            <span>
+              with the sky.
+            </span>
+
           </h1>
 
+
+
           <p class="hero-text">
-            Search any city to see live weather,
-            detailed conditions and a five-day forecast.
+
+            Search any city to explore live weather,
+            detailed conditions, hourly updates and
+            the upcoming five-day forecast.
+
           </p>
 
 
-          <!-- Search -->
+
+          <!-- =========================================
+               SEARCH
+          ========================================== -->
 
           <div class="search-area">
+
 
             <form
               id="weather-search-form"
               class="search-form"
             >
 
+
               <label
                 for="city-search"
                 class="sr-only"
               >
-                Search city
+                Search for a city
               </label>
+
 
               <span
                 class="search-icon"
@@ -149,48 +247,67 @@
                 ⌕
               </span>
 
+
               <input
                 type="search"
                 id="city-search"
+                name="city"
                 placeholder="Search Exeter, London, Tokyo..."
                 autocomplete="off"
+                spellcheck="false"
                 required
               >
+
 
               <button type="submit">
                 Search
               </button>
 
+
             </form>
 
+
+
+            <!-- Current Location -->
 
             <button
               type="button"
               id="current-location-button"
               class="location-button"
             >
-              <span>◎</span>
+
+              <span aria-hidden="true">
+                ◎
+              </span>
+
               Use my location
+
             </button>
+
 
           </div>
 
 
-          <!-- Suggestions -->
+
+          <!-- Search Suggestions -->
 
           <div
             id="search-suggestions"
             class="search-suggestions"
+            aria-live="polite"
           ></div>
 
 
-          <!-- Status -->
+
+          <!-- Loading / Error Message -->
 
           <div
             id="weather-status"
             class="weather-status"
+            role="status"
             aria-live="polite"
           ></div>
+
 
         </div>
 
@@ -199,26 +316,45 @@
     </section>
 
 
-    <!-- Weather Dashboard -->
 
-    <section class="weather-dashboard">
+    <!-- =========================================
+         WEATHER DASHBOARD
+    ========================================== -->
+
+    <section
+      id="weather-dashboard"
+      class="weather-dashboard"
+    >
 
       <div class="container">
+
 
         <div class="dashboard-grid">
 
 
-          <!-- Main Weather Card -->
+          <!-- =========================================
+               CURRENT WEATHER CARD
+          ========================================== -->
 
           <article
-            class="current-weather-card"
             id="current-weather-card"
+            class="current-weather-card"
           >
 
-            <div class="weather-card-glow"></div>
 
+            <!-- Decorative Glow -->
+
+            <div
+              class="weather-card-glow"
+              aria-hidden="true"
+            ></div>
+
+
+
+            <!-- Card Header -->
 
             <div class="current-card-header">
+
 
               <div>
 
@@ -226,13 +362,16 @@
                   CURRENT WEATHER
                 </span>
 
+
                 <h2 id="location-name">
                   Exeter, United Kingdom
                 </h2>
 
+
                 <p id="current-date">
-                  Loading...
+                  Loading date...
                 </p>
+
 
                 <p
                   id="local-time"
@@ -241,29 +380,48 @@
                   Local time --:--
                 </p>
 
+
+                <p
+                  id="last-updated"
+                  class="last-updated"
+                >
+                  Updated just now
+                </p>
+
               </div>
 
+
+
+              <!-- Favourite Button -->
 
               <button
                 type="button"
                 id="favourite-button"
                 class="favourite-button"
+                aria-label="Add location to favourites"
                 title="Add to favourites"
-                aria-label="Add to favourites"
               >
                 ☆
               </button>
 
+
             </div>
 
 
+
+            <!-- Current Temperature -->
+
             <div class="current-weather-main">
+
+
+              <!-- Weather Icon -->
 
               <div class="weather-icon-box">
 
                 <div
                   id="weather-icon"
                   class="weather-icon"
+                  aria-hidden="true"
                 >
                   ☀️
                 </div>
@@ -271,7 +429,11 @@
               </div>
 
 
-              <div>
+
+              <!-- Temperature -->
+
+              <div class="temperature-content">
+
 
                 <div class="temperature">
 
@@ -286,6 +448,7 @@
                 </div>
 
 
+
                 <p
                   id="weather-description"
                   class="weather-description"
@@ -294,10 +457,13 @@
                 </p>
 
 
+
                 <p class="feels-like">
+
                   Feels like
 
                   <strong>
+
                     <span id="feels-like">
                       --
                     </span>
@@ -305,118 +471,280 @@
                     <span id="feels-like-unit">
                       °C
                     </span>
+
                   </strong>
+
                 </p>
+
 
               </div>
 
+
             </div>
 
+
+
+            <!-- High / Low -->
 
             <div class="temperature-range">
 
+
               <span>
+
                 ↑ High
+
                 <strong id="today-high">
                   --
                 </strong>
+
               </span>
 
+
               <span>
+
                 ↓ Low
+
                 <strong id="today-low">
                   --
                 </strong>
+
               </span>
 
+
             </div>
+
 
           </article>
 
 
-          <!-- Details -->
+
+          <!-- =========================================
+               WEATHER DETAILS
+          ========================================== -->
 
           <div class="weather-details-grid">
 
+
+            <!-- Humidity -->
+
             <article class="detail-card">
-              <div class="detail-icon">💧</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                💧
+              </div>
 
               <div>
-                <span>Humidity</span>
-                <strong id="humidity">--%</strong>
+
+                <span>
+                  Humidity
+                </span>
+
+                <strong id="humidity">
+                  --%
+                </strong>
+
               </div>
+
             </article>
 
 
+
+            <!-- Wind -->
+
             <article class="detail-card">
-              <div class="detail-icon">🌬️</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                🌬️
+              </div>
 
               <div>
-                <span>Wind Speed</span>
+
+                <span>
+                  Wind Speed
+                </span>
+
                 <strong id="wind-speed">
                   -- km/h
                 </strong>
+
               </div>
+
             </article>
 
 
+
+            <!-- Visibility -->
+
             <article class="detail-card">
-              <div class="detail-icon">👁️</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                👁️
+              </div>
 
               <div>
-                <span>Visibility</span>
+
+                <span>
+                  Visibility
+                </span>
+
                 <strong id="visibility">
                   -- km
                 </strong>
+
               </div>
+
             </article>
 
 
+
+            <!-- Precipitation -->
+
             <article class="detail-card">
-              <div class="detail-icon">☔</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                ☔
+              </div>
 
               <div>
-                <span>Precipitation</span>
+
+                <span>
+                  Precipitation
+                </span>
+
                 <strong id="precipitation">
                   -- mm
                 </strong>
+
               </div>
+
             </article>
 
 
+
+            <!-- Sunrise -->
+
             <article class="detail-card">
-              <div class="detail-icon">🌅</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                🌅
+              </div>
 
               <div>
-                <span>Sunrise</span>
+
+                <span>
+                  Sunrise
+                </span>
+
                 <strong id="sunrise">
                   --:--
                 </strong>
+
               </div>
+
             </article>
 
 
+
+            <!-- Sunset -->
+
             <article class="detail-card">
-              <div class="detail-icon">🌇</div>
+
+              <div
+                class="detail-icon"
+                aria-hidden="true"
+              >
+                🌇
+              </div>
 
               <div>
-                <span>Sunset</span>
+
+                <span>
+                  Sunset
+                </span>
+
                 <strong id="sunset">
                   --:--
                 </strong>
+
               </div>
+
             </article>
 
+
           </div>
+
 
         </div>
 
 
-        <!-- Forecast -->
+
+        <!-- =========================================
+             HOURLY FORECAST
+        ========================================== -->
+
+        <section class="hourly-section">
+
+
+          <div class="section-heading">
+
+
+            <div>
+
+              <span class="section-label">
+                TODAY
+              </span>
+
+              <h2>
+                Hourly Forecast
+              </h2>
+
+            </div>
+
+
+            <p>
+              Follow the weather through the next few hours.
+            </p>
+
+
+          </div>
+
+
+
+          <div
+            id="hourly-forecast"
+            class="hourly-forecast"
+            aria-live="polite"
+          ></div>
+
+
+        </section>
+
+
+
+        <!-- =========================================
+             5 DAY FORECAST
+        ========================================== -->
 
         <section class="forecast-section">
 
+
           <div class="section-heading">
+
 
             <div>
 
@@ -430,11 +758,14 @@
 
             </div>
 
+
             <p>
               Plan ahead with the latest forecast.
             </p>
 
+
           </div>
+
 
 
           <div
@@ -442,51 +773,130 @@
             class="forecast-grid"
           >
 
-            <article class="forecast-card placeholder-card">
-              <span>Today</span>
-              <div class="forecast-icon">☀️</div>
-              <strong>--°</strong>
-              <small>Low --°</small>
-            </article>
+
+            <!-- Loading Placeholder -->
 
             <article class="forecast-card placeholder-card">
-              <span>Tomorrow</span>
-              <div class="forecast-icon">🌤️</div>
-              <strong>--°</strong>
-              <small>Low --°</small>
+
+              <span>
+                Today
+              </span>
+
+              <div class="forecast-icon">
+                ☀️
+              </div>
+
+              <strong>
+                --°
+              </strong>
+
+              <small>
+                Low --°
+              </small>
+
             </article>
 
-            <article class="forecast-card placeholder-card">
-              <span>--</span>
-              <div class="forecast-icon">☁️</div>
-              <strong>--°</strong>
-              <small>Low --°</small>
-            </article>
 
             <article class="forecast-card placeholder-card">
-              <span>--</span>
-              <div class="forecast-icon">🌦️</div>
-              <strong>--°</strong>
-              <small>Low --°</small>
+
+              <span>
+                Tomorrow
+              </span>
+
+              <div class="forecast-icon">
+                🌤️
+              </div>
+
+              <strong>
+                --°
+              </strong>
+
+              <small>
+                Low --°
+              </small>
+
             </article>
 
+
             <article class="forecast-card placeholder-card">
-              <span>--</span>
-              <div class="forecast-icon">🌤️</div>
-              <strong>--°</strong>
-              <small>Low --°</small>
+
+              <span>
+                --
+              </span>
+
+              <div class="forecast-icon">
+                ☁️
+              </div>
+
+              <strong>
+                --°
+              </strong>
+
+              <small>
+                Low --°
+              </small>
+
             </article>
+
+
+            <article class="forecast-card placeholder-card">
+
+              <span>
+                --
+              </span>
+
+              <div class="forecast-icon">
+                🌦️
+              </div>
+
+              <strong>
+                --°
+              </strong>
+
+              <small>
+                Low --°
+              </small>
+
+            </article>
+
+
+            <article class="forecast-card placeholder-card">
+
+              <span>
+                --
+              </span>
+
+              <div class="forecast-icon">
+                🌤️
+              </div>
+
+              <strong>
+                --°
+              </strong>
+
+              <small>
+                Low --°
+              </small>
+
+            </article>
+
 
           </div>
+
 
         </section>
 
 
-        <!-- Favourite Locations -->
+
+        <!-- =========================================
+             SAVED LOCATIONS
+        ========================================== -->
 
         <section class="saved-section">
 
+
           <div class="section-heading">
+
 
             <div>
 
@@ -500,38 +910,72 @@
 
             </div>
 
+
+            <p>
+              Save your favourite cities for faster access.
+            </p>
+
+
           </div>
+
 
 
           <div
             id="saved-locations"
             class="saved-locations"
-          ></div>
+          >
+
+
+            <div class="empty-favourites">
+
+              <span aria-hidden="true">
+                ☆
+              </span>
+
+              <p>
+                Save your favourite cities for quick access.
+              </p>
+
+            </div>
+
+
+          </div>
+
 
         </section>
+
 
       </div>
 
     </section>
 
+
   </main>
 
 
-  <!-- Footer -->
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
 
   <footer class="footer">
 
     <div class="container footer-content">
 
+
       <a
         href="index.html"
         class="logo footer-logo"
       >
-        <span class="logo-icon">☁</span>
+
+        <span class="logo-icon">
+          ☁
+        </span>
 
         <span>
           Sky<span>Cast</span>
         </span>
+
       </a>
 
 
@@ -544,12 +988,17 @@
         Built with HTML, CSS & JavaScript
       </p>
 
+
     </div>
 
   </footer>
 
 
+
+  <!-- JavaScript -->
+
   <script src="script.js"></script>
+
 
 </body>
 
